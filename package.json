@@ -1,0 +1,24 @@
+{
+  "name": "taky-billing-schedule",
+  "description": "dynamic schedule generation for cyclic billing",
+  "version": "0.0.1",
+  "main": "./dist/module.js",
+  "author": "douglas lauer <taky@taky.com>",
+  "repository": "douglauer/taky-billing-schedule",
+  "keywords": [
+    "taky",
+    "subscription",
+    "subscription billing",
+    "cycle",
+    "billing",
+    "schedule",
+    "continuity"
+  ],
+  "dependencies": {
+    "custom-human-time": "^1.0.3",
+    "human-interval": "^0.1.5",
+    "iced-coffee-script": "^108.0.8",
+    "lodash": "^3.10.1",
+    "mongoose": "^4.1.7"
+  }
+}
