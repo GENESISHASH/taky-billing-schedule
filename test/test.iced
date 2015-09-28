@@ -33,6 +33,12 @@ it 'should produce an array of schedule objects', (done) ->
   queue = cycle.next 10
   done() if helpers.type(queue) is 'array' and queue.length
 
+it 'should accept humanized output as valid new object input', (done) ->
+  cycle = new Cycle valid_opts
+  humanized = cycle.humanize()
+  new_cycle = new Cycle humanized
+  done() if helpers.type(new_cycle) isnt 'error'
+
 it 'should show an initial_method charge as the first item', (done) ->
   cycle = new Cycle valid_opts
   first = _.first(cycle.next 1,1442289600)
