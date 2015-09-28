@@ -82,7 +82,7 @@
     return clone;
   };
 
-  Schema.methods.next = function(num_items, ctime, last_success) {
+  Schema.methods.next = function(num_items, ctime, last_success, options) {
     var actions, after_trial, cursor, cursor_cycle, cycle_charge, initial, template;
     if (num_items == null) {
       num_items = 1;
@@ -92,6 +92,9 @@
     }
     if (last_success == null) {
       last_success = null;
+    }
+    if (options == null) {
+      options = {};
     }
     if (last_success) {
       last_success = +last_success;
@@ -110,7 +113,7 @@
       amount_dollars: null
     };
     actions = [];
-    if (this.initial_method !== 'none' && !last_success) {
+    if ((this.initial_method !== 'none' && !last_success) && !options.cycles_only) {
       initial = _.clone(template);
       initial.amount_cents = this.initial_amount_cents;
       initial.action = this.initial_method;
@@ -122,7 +125,7 @@
     cursor_cycle = 0;
     if (this.trial_seconds) {
       cursor += this.trial_seconds;
-      if (!last_success || last_success < cursor) {
+      if ((!last_success || last_success < cursor) && !options.cycles_only) {
         if (this.after_trial_method !== 'none') {
           after_trial = _.clone(template);
           after_trial.amount_cents = this.after_trial_amount_cents;

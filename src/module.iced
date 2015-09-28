@@ -81,7 +81,7 @@ Schema.methods.humanize = ->
   clone
 
 # calculate the next $num scheduled actions
-Schema.methods.next = (num_items=1,ctime=null,last_success=null) ->
+Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
   last_success = +last_success if last_success
 
   if ctime
@@ -101,7 +101,7 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null) ->
   actions = []
 
   # push initial action if this is a new cycle object
-  if @initial_method isnt 'none' and !last_success
+  if (@initial_method isnt 'none' and !last_success) and !options.cycles_only
     initial = _.clone template
     initial.amount_cents = @initial_amount_cents
     initial.action = @initial_method
@@ -118,7 +118,7 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null) ->
   if @trial_seconds
     cursor += @trial_seconds
 
-    if !last_success or last_success < cursor
+    if (!last_success or last_success < cursor) and !options.cycles_only
       if @after_trial_method isnt 'none'
         after_trial = _.clone template
         after_trial.amount_cents = @after_trial_amount_cents
