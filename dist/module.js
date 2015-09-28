@@ -58,18 +58,24 @@
   });
 
   Schema.methods.humanize = function() {
-    var clone, k, v;
+    var check, clone, k, v;
     clone = this.toJSON();
     for (k in clone) {
       v = clone[k];
       if (k.indexOf('_seconds') > -1) {
         if (v) {
-          clone[k + '_human'] = helpers.to_human(v);
+          check = (clone[k + '_human'] = helpers.to_human(v));
+          if (helpers.type(check) === 'error') {
+            return check;
+          }
         }
       }
       if (k.indexOf('_cents') > -1) {
         if (v) {
-          clone[k.replace('_cents', '_dollars')] = helpers.to_dollars(v);
+          check = (clone[k.replace('_cents', '_dollars')] = helpers.to_dollars(v));
+          if (helpers.type(check) === 'error') {
+            return check;
+          }
         }
       }
     }
@@ -160,17 +166,23 @@
   Model = mongoose.model('Cycle', Schema);
 
   module.exports = Cycle = function(opt) {
-    var cents_key, err, k, model, v;
+    var cents_key, check, err, k, model, v;
     for (k in opt) {
       v = opt[k];
       if (k.indexOf('_seconds_human') > -1) {
-        opt[k.replace('_seconds_human', '_seconds')] = helpers.to_seconds(v);
+        check = (opt[k.replace('_seconds_human', '_seconds')] = helpers.to_seconds(v));
+        if (helpers.type(check) === 'error') {
+          return check;
+        }
       }
     }
     for (k in opt) {
       v = opt[k];
       if (k.indexOf('_dollars') && !opt[(cents_key = k.replace('_dollars', '_cents'))]) {
-        opt[cents_key] = helpers.to_cents(v);
+        check = (opt[cents_key] = helpers.to_cents(v));
+        if (helpers.type(check) === 'error') {
+          return check;
+        }
       }
     }
     model = new Model(opt);

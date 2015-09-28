@@ -43,7 +43,7 @@
       try {
         return Math.round(human_interval(str) / 1000);
       } catch (_error) {
-        throw new Error('Time description "' + str + '" could not be parsed');
+        return new Error('Time description "' + str + '" could not be parsed');
       }
     },
     to_human: function(secs) {
@@ -74,7 +74,7 @@
           return str = [count, label + (!singular ? 's' : '')].join(' ');
         }
       }
-      throw new Error('Failed to convert seconds to human format');
+      return new Error('Failed to convert seconds to human format');
     },
     to_dollars: function(str) {
       var num;

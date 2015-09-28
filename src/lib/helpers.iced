@@ -33,7 +33,7 @@ module.exports = helpers =
     try
       Math.round human_interval(str)/1000
     catch
-      throw new Error 'Time description "' + str + '" could not be parsed'
+      return new Error 'Time description "' + str + '" could not be parsed'
 
   # convert seconds to human expression
   to_human: (secs) ->
@@ -81,7 +81,7 @@ module.exports = helpers =
           label + (if !singular then 's' else '')
         ].join ' '
 
-    throw new Error 'Failed to convert seconds to human format'
+    return new Error 'Failed to convert seconds to human format'
 
   to_dollars: (str) ->
     num = @clean_number str

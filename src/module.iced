@@ -70,11 +70,13 @@ Schema.methods.humanize = ->
   for k,v of clone
     if k.indexOf('_seconds') > -1
       if v
-        clone[k + '_human'] = helpers.to_human v
+        check = (clone[k + '_human'] = helpers.to_human v)
+        return check if helpers.type(check) is 'error'
 
     if k.indexOf('_cents') > -1
       if v
-        clone[k.replace('_cents','_dollars')] = helpers.to_dollars v
+        check = (clone[k.replace('_cents','_dollars')] = helpers.to_dollars v)
+        return check if helpers.type(check) is 'error'
 
   clone
 
@@ -164,14 +166,16 @@ module.exports = Cycle = (opt) ->
   # allow humanized inputs
   for k,v of opt
     if k.indexOf('_seconds_human') > -1
-      opt[k.replace('_seconds_human','_seconds')] = helpers.to_seconds v
+      check = (opt[k.replace('_seconds_human','_seconds')] = helpers.to_seconds v)
+      return check if helpers.type(check) is 'error'
 
   # dollars/cents helper
   for k,v of opt
     if k.indexOf('_dollars') and !opt[(cents_key = k.replace('_dollars','_cents'))]
-      opt[cents_key] = helpers.to_cents v
+      check = (opt[cents_key] = helpers.to_cents v)
+      return check if helpers.type(check) is 'error'
 
-  # create model
+  # create model, run validation
   model = new Model opt
 
   err = model.validateSync()
