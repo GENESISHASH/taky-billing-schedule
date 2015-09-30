@@ -68,8 +68,29 @@ console.log cycle.next 10
 ```
 
 ## .humanize()
-return humanized output for cycle properties
+return cycle properties with human-friendly properties
 
-## .next(num=1,created=null,last=null)
-generate the next *num* scheduled items based on the cycle properties
+## .next(num_items=1,options={})
+generate the next *num_items* scheduled items based on the cycle properties and options
+object provided
+
+``` coffeescript
+opts =
+  ctime: 1442289600  # unix time billing cycle was started
+  last_success: null # last unix time a successful billing occured
+  skip_ranges: null  # array of time-ranges to exclude
+  cycles_only: true  # only return primary billing cycles
+
+next_bill = _.first(cycle.next 10, opts)
+console.log next_bill
+
+###
+{ time: 1442289600,
+    date: Tue Sep 15 2015 00:00:00 GMT-0400 (EDT),
+    action: 'charge',
+    reason: 'initial_method',
+    amount_cents: 1200,
+    amount_dollars: '12.00' }
+###
+```
 

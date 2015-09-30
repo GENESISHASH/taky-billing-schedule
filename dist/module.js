@@ -83,7 +83,7 @@
   };
 
   Schema.methods.next = function(num_items, ctime, last_success, options) {
-    var actions, after_trial, cursor, cursor_cycle, cycle_charge, initial, template;
+    var actions, after_trial, clone, cursor, cursor_cycle, cycle_charge, initial, range, skip_action, skip_ranges, template, x, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4;
     if (num_items == null) {
       num_items = 1;
     }
@@ -96,8 +96,23 @@
     if (options == null) {
       options = {};
     }
+    if (ctime && helpers.type(ctime) === 'object') {
+      clone = _.clone(ctime);
+      last_success = (_ref = clone.last_success) != null ? _ref : null;
+      ctime = (_ref1 = clone.ctime) != null ? _ref1 : null;
+      options.skip_ranges = (_ref2 = clone.skip_ranges) != null ? _ref2 : null;
+      options.cycles_only = (_ref3 = clone.cycles_only) != null ? _ref3 : null;
+    }
     if (last_success) {
       last_success = +last_success;
+    }
+    skip_ranges = [];
+    if (options.skip_ranges) {
+      _ref4 = options.skip_ranges;
+      for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+        x = _ref4[_i];
+        skip_ranges.push(x);
+      }
     }
     if (ctime) {
       ctime = +ctime;
@@ -148,7 +163,19 @@
       cycle_charge.action = 'charge';
       cycle_charge.reason = 'cycle_' + cursor_cycle;
       cycle_charge.time = cursor;
-      actions.push(cycle_charge);
+      skip_action = false;
+      if (skip_ranges.length) {
+        for (_j = 0, _len1 = skip_ranges.length; _j < _len1; _j++) {
+          range = skip_ranges[_j];
+          if (cursor >= range[0] && cursor <= range[1]) {
+            skip_action = true;
+            break;
+          }
+        }
+      }
+      if (!skip_action) {
+        actions.push(cycle_charge);
+      }
       cursor += this.cycle_seconds;
       cursor_cycle += 1;
     }

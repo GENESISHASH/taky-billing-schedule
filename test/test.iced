@@ -85,11 +85,39 @@ it 'should start with the second cycle (cycle_1) due to last_success time', (don
   first_cycle = 1442289600 + (3600*24*7)
   second_cycle = 1442289600 + (3600*24*37)
 
-  queue = cycle.next 10, 1442289600,first_cycle
+  queue = cycle.next 10, 1442289600, first_cycle
   first = _.first queue
 
   if first.reason isnt 'cycle_1' or first.time isnt second_cycle or first.amount_cents isnt 999
     return done 'First queue item did not meet the expected requirements'
 
   done()
+
+it 'should allow for an array of skippable unix time ranges', (done) ->
+  cycle = new Cycle valid_opts
+
+  first_cycle = 1442289600 + (3600*24*7)
+  second_cycle = 1442289600 + (3600*24*37)
+
+  queue = cycle.next 10, 1442289600, null, {
+    skip_ranges: [
+      [second_cycle,(second_cycle+1)]
+    ]
+  }
+
+  query = {reason:'cycle_1'}
+  done() if !_.find(queue,query)
+
+it 'should allow for object argument in .next()', (done) ->
+  cycle = new Cycle valid_opts
+
+  opts =
+    ctime: 1442289600
+    last_success: null
+    skip_ranges: null
+    cycles_only: yes
+
+  first = _.first(cycle.next 10, opts)
+
+  done() if first.reason is 'cycle_0' and first.amount_cents is 999
 

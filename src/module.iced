@@ -82,7 +82,21 @@ Schema.methods.humanize = ->
 
 # calculate the next $num scheduled actions
 Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
+  if ctime and helpers.type(ctime) is 'object'
+    clone = _.clone ctime
+
+    last_success = clone.last_success ? null
+    ctime = clone.ctime ? null
+
+    options.skip_ranges = clone.skip_ranges ? null
+    options.cycles_only = clone.cycles_only ? null
+
   last_success = +last_success if last_success
+
+  skip_ranges = []
+
+  if options.skip_ranges
+    skip_ranges.push x for x in options.skip_ranges
 
   if ctime
     ctime = +ctime
@@ -141,7 +155,17 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
     cycle_charge.reason = 'cycle_' + cursor_cycle
     cycle_charge.time = cursor
 
-    actions.push cycle_charge
+    # determine if we should skip this action due to options.skip_ranges
+    skip_action = no
+
+    if skip_ranges.length
+      for range in skip_ranges
+        if cursor >= range[0] and cursor <= range[1]
+          skip_action = yes
+          break
+
+    if !skip_action
+      actions.push cycle_charge
 
     cursor += @cycle_seconds
     cursor_cycle += 1
