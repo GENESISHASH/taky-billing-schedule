@@ -76,21 +76,21 @@ object provided
 
 ``` coffeescript
 opts =
-  ctime: 1442289600  # unix time billing cycle was started
-  last_success: null # last unix time a successful billing occured
-  skip_ranges: null  # array of time-ranges to exclude
+  ctime: 1442289600  # unix time cycle was started
+  last_success: null # last unix time a successful billing occurred
+  skip_ranges: null  # array of time-ranges to exclude, [min,max]
   cycles_only: true  # only return primary billing cycles
 
 next_bill = _.first(cycle.next 10, opts)
 console.log next_bill
 
 ###
-{ time: 1442289600,
-    date: Tue Sep 15 2015 00:00:00 GMT-0400 (EDT),
-    action: 'charge',
-    reason: 'initial_method',
-    amount_cents: 1200,
-    amount_dollars: '12.00' }
+{ time: 1442894400,
+  date: Tue Sep 22 2015 00:00:00 GMT-0400 (EDT),
+  action: 'charge',
+  reason: 'cycle_0',
+  amount_cents: 999,
+  amount_dollars: '9.99' }
 ###
 ```
 
