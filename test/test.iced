@@ -101,12 +101,11 @@ it 'should allow for an array of skippable unix time ranges', (done) ->
 
   queue = cycle.next 10, 1442289600, null, {
     skip_ranges: [
-      [second_cycle,(second_cycle+1)]
+      [1445486400,1445486401]
     ]
   }
 
-  query = {reason:'cycle_1'}
-  done() if !_.find(queue,query)
+  done() if !_.find(queue,{reason:'cycle_1'})
 
 it 'should allow for object argument in .next()', (done) ->
   cycle = new Cycle valid_opts
@@ -120,4 +119,13 @@ it 'should allow for object argument in .next()', (done) ->
   first = _.first(cycle.next 10, opts)
 
   done() if first.reason is 'cycle_0' and first.amount_cents is 999
+
+it 'should allow for skipping of cycles by int', (done) ->
+  cycle = new Cycle valid_opts
+
+  queue = cycle.next 10, {
+    skip_cycles: [5]
+  }
+
+  done() if !_.find(queue,{cycle_int:5})
 

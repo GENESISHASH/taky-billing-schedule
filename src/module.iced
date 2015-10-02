@@ -89,14 +89,22 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
     ctime = clone.ctime ? null
 
     options.skip_ranges = clone.skip_ranges ? null
+    options.skip_cycles = clone.skip_cycles ? null
     options.cycles_only = clone.cycles_only ? null
+
+  if options.skip_cycles and helpers.type(options.skip_cycles) isnt 'array'
+    options.skip_cycles = [options.skip_cycles]
 
   last_success = +last_success if last_success
 
   skip_ranges = []
+  skip_cycles = []
 
   if options.skip_ranges
     skip_ranges.push x for x in options.skip_ranges
+
+  if options.skip_cycles
+    skip_cycles.push (+x) for x in options.skip_cycles
 
   if ctime
     ctime = +ctime
@@ -153,9 +161,11 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
     cycle_charge.amount_cents = @cycle_amount_cents
     cycle_charge.action = 'charge'
     cycle_charge.reason = 'cycle_' + cursor_cycle
+    cycle_charge.cycle_int = cursor_cycle
     cycle_charge.time = cursor
 
     # determine if we should skip this action due to options.skip_ranges
+    # or options.skip_cycles
     skip_action = no
 
     if skip_ranges.length
@@ -163,6 +173,10 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
         if cursor >= range[0] and cursor <= range[1]
           skip_action = yes
           break
+
+    if skip_cycles.length
+      if cursor_cycle in skip_cycles
+        skip_action = yes
 
     if !skip_action
       actions.push cycle_charge
