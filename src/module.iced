@@ -88,6 +88,7 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
     last_success = clone.last_success ? null
     ctime = clone.ctime ? null
 
+    options.max_time = clone.max_time ? no
     options.skip_ranges = clone.skip_ranges ? null
     options.skip_cycles = clone.skip_cycles ? null
     options.cycles_only = clone.cycles_only ? null
@@ -105,6 +106,11 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
 
   if options.skip_cycles
     skip_cycles.push (+x) for x in options.skip_cycles
+
+  if options.max_time and helpers.type(options.max_time) in ['string','number']
+    max_time = (+options.max_time)
+  else
+    max_time = no
 
   if ctime
     ctime = +ctime
@@ -177,6 +183,9 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
     if skip_cycles.length
       if cursor_cycle in skip_cycles
         skip_action = yes
+
+    if max_time and cursor > max_time
+      break
 
     if !skip_action
       actions.push cycle_charge

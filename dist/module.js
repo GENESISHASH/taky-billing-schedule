@@ -84,7 +84,7 @@
   };
 
   Schema.methods.next = function(num_items, ctime, last_success, options) {
-    var actions, after_trial, clone, cursor, cursor_cycle, cycle_charge, initial, range, skip_action, skip_cycles, skip_ranges, template, x, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+    var actions, after_trial, clone, cursor, cursor_cycle, cycle_charge, initial, max_time, range, skip_action, skip_cycles, skip_ranges, template, x, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
     if (num_items == null) {
       num_items = 1;
     }
@@ -101,9 +101,10 @@
       clone = _.clone(ctime);
       last_success = (_ref = clone.last_success) != null ? _ref : null;
       ctime = (_ref1 = clone.ctime) != null ? _ref1 : null;
-      options.skip_ranges = (_ref2 = clone.skip_ranges) != null ? _ref2 : null;
-      options.skip_cycles = (_ref3 = clone.skip_cycles) != null ? _ref3 : null;
-      options.cycles_only = (_ref4 = clone.cycles_only) != null ? _ref4 : null;
+      options.max_time = (_ref2 = clone.max_time) != null ? _ref2 : false;
+      options.skip_ranges = (_ref3 = clone.skip_ranges) != null ? _ref3 : null;
+      options.skip_cycles = (_ref4 = clone.skip_cycles) != null ? _ref4 : null;
+      options.cycles_only = (_ref5 = clone.cycles_only) != null ? _ref5 : null;
     }
     if (options.skip_cycles && helpers.type(options.skip_cycles) !== 'array') {
       options.skip_cycles = [options.skip_cycles];
@@ -114,18 +115,23 @@
     skip_ranges = [];
     skip_cycles = [];
     if (options.skip_ranges) {
-      _ref5 = options.skip_ranges;
-      for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
-        x = _ref5[_i];
+      _ref6 = options.skip_ranges;
+      for (_i = 0, _len = _ref6.length; _i < _len; _i++) {
+        x = _ref6[_i];
         skip_ranges.push(x);
       }
     }
     if (options.skip_cycles) {
-      _ref6 = options.skip_cycles;
-      for (_j = 0, _len1 = _ref6.length; _j < _len1; _j++) {
-        x = _ref6[_j];
+      _ref7 = options.skip_cycles;
+      for (_j = 0, _len1 = _ref7.length; _j < _len1; _j++) {
+        x = _ref7[_j];
         skip_cycles.push(+x);
       }
+    }
+    if (options.max_time && ((_ref8 = helpers.type(options.max_time)) === 'string' || _ref8 === 'number')) {
+      max_time = +options.max_time;
+    } else {
+      max_time = false;
     }
     if (ctime) {
       ctime = +ctime;
@@ -191,6 +197,9 @@
         if (__indexOf.call(skip_cycles, cursor_cycle) >= 0) {
           skip_action = true;
         }
+      }
+      if (max_time && cursor > max_time) {
+        break;
       }
       if (!skip_action) {
         actions.push(cycle_charge);

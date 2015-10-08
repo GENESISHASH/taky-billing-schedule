@@ -77,6 +77,7 @@ object provided
 ``` coffeescript
 opts =
   ctime: 1442289600  # unix time cycle was started
+  max_time: null     # optional unix time to limit the results at
   last_success: null # last unix time a successful billing occurred
   skip_ranges: null  # array of time-ranges to exclude, [min,max]
   cycles_only: true  # only return primary billing cycles

@@ -129,3 +129,14 @@ it 'should allow for skipping of cycles by int', (done) ->
 
   done() if !_.find(queue,{cycle_int:5})
 
+it 'should allow for max_time to limit the amount of results', (done) ->
+  cycle = new Cycle valid_opts
+
+  queue = cycle.next 10, {
+    ctime: 1442289600
+    max_time: 1453262401
+    cycles_only: yes
+  }
+
+  done() if queue.length is 5
+
