@@ -17,6 +17,16 @@ valid_opts = {
   max_cycles: 0
 }
 
+hybrid_opts = {
+  cycle_seconds_human: '30 days'
+  trial_seconds_human: '7 days'
+  cycle_amount_dollars: '50.00'
+  initial_charge_amount_dollars: '1.00'
+  initial_auth_amount_dollars: '50.00'
+  initial_method: 'authorize_void_charge'
+  max_cycles: 0
+}
+
 invalid_opts = _.clone valid_opts
 delete invalid_opts.cycle_amount_dollars
 
@@ -139,4 +149,16 @@ it 'should allow for max_time to limit the amount of results', (done) ->
   }
 
   done() if queue.length is 5
+
+it 'should allow for hybrid authorize/charge initial method actions', (done) ->
+  cycle = new Cycle hybrid_opts
+  queue = cycle.next 10
+
+  charge_item = _.find(queue,{action:'charge',reason:'initial_method'})
+  auth_item = _.find(queue,{action:'authorize_void',reason:'initial_method'})
+
+  if !charge_item or !auth_item
+    return done new Error 'Failed to find one of the initial methods'
+
+  done() if charge_item.amount_cents is 100 and auth_item.amount_cents is 5000
 

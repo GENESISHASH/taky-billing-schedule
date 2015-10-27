@@ -25,12 +25,23 @@ Schema = new mongoose.Schema {
     required: yes
     default: 0
 
+  initial_auth_amount_cents:
+    type: Number
+    required: yes
+    default: 0
+
+  initial_charge_amount_cents:
+    type: Number
+    required: yes
+    default: 0
+
   initial_method:
     type: String
     enum: [
       'none'
       'authorize_void'
       'charge'
+      'authorize_void_charge'
     ]
     required: yes
     default: 'none'
@@ -130,13 +141,30 @@ Schema.methods.next = (num_items=1,ctime=null,last_success=null,options={}) ->
 
   # push initial action if this is a new cycle object
   if (@initial_method isnt 'none' and !last_success) and !options.cycles_only
-    initial = _.clone template
-    initial.amount_cents = @initial_amount_cents
-    initial.action = @initial_method
-    initial.reason = 'initial_method'
-    initial.time = ctime
 
-    actions.push initial
+    # allow for hybrid authorize_void_charge (push auth action)
+    if @initial_method in ['authorize_void','authorize_void_charge']
+      initial = _.clone template
+
+      val = @initial_auth_amount_cents
+
+      initial.amount_cents = @initial_auth_amount_cents || @initial_amount_cents
+      initial.action = 'authorize_void'
+      initial.reason = 'initial_method'
+      initial.time = ctime
+
+      actions.push initial
+
+    # allow for hybrid authorize_void_charge (push charge action)
+    if @initial_method in ['charge','authorize_void_charge']
+      initial = _.clone template
+
+      initial.amount_cents = @initial_charge_amount_cents || @initial_amount_cents
+      initial.action = 'charge'
+      initial.reason = 'initial_method'
+      initial.time = ctime
+
+      actions.push initial
 
   # set the cursor to the creation time of the cycle
   cursor = ctime
