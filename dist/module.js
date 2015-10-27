@@ -30,9 +30,19 @@
       required: true,
       "default": 0
     },
+    initial_auth_amount_cents: {
+      type: Number,
+      required: true,
+      "default": 0
+    },
+    initial_charge_amount_cents: {
+      type: Number,
+      required: true,
+      "default": 0
+    },
     initial_method: {
       type: String,
-      "enum": ['none', 'authorize_void', 'charge'],
+      "enum": ['none', 'authorize_void', 'charge', 'authorize_void_charge'],
       required: true,
       "default": 'none'
     },
@@ -84,7 +94,7 @@
   };
 
   Schema.methods.next = function(num_items, ctime, last_success, options) {
-    var actions, after_trial, clone, cursor, cursor_cycle, cycle_charge, initial, max_time, range, skip_action, skip_cycles, skip_ranges, template, x, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
+    var actions, after_trial, clone, cursor, cursor_cycle, cycle_charge, initial, max_time, range, skip_action, skip_cycles, skip_ranges, template, val, x, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref10, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
     if (num_items == null) {
       num_items = 1;
     }
@@ -148,12 +158,23 @@
     };
     actions = [];
     if ((this.initial_method !== 'none' && !last_success) && !options.cycles_only) {
-      initial = _.clone(template);
-      initial.amount_cents = this.initial_amount_cents;
-      initial.action = this.initial_method;
-      initial.reason = 'initial_method';
-      initial.time = ctime;
-      actions.push(initial);
+      if ((_ref9 = this.initial_method) === 'authorize_void' || _ref9 === 'authorize_void_charge') {
+        initial = _.clone(template);
+        val = this.initial_auth_amount_cents;
+        initial.amount_cents = this.initial_auth_amount_cents || this.initial_amount_cents;
+        initial.action = 'authorize_void';
+        initial.reason = 'initial_method';
+        initial.time = ctime;
+        actions.push(initial);
+      }
+      if ((_ref10 = this.initial_method) === 'charge' || _ref10 === 'authorize_void_charge') {
+        initial = _.clone(template);
+        initial.amount_cents = this.initial_charge_amount_cents || this.initial_amount_cents;
+        initial.action = 'charge';
+        initial.reason = 'initial_method';
+        initial.time = ctime;
+        actions.push(initial);
+      }
     }
     cursor = ctime;
     cursor_cycle = 0;
