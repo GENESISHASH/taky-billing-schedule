@@ -25,12 +25,23 @@ Schema = new mongoose.Schema {
     required: yes
     default: 0
 
+  initial_auth_amount_cents:
+    type: Number
+    required: yes
+    default: 0
+
+  initial_void_amount_cents:
+    type: Number
+    required: yes
+    default: 0
+
   initial_method:
     type: String
     enum: [
       'none'
       'authorize_void'
       'charge'
+      'authorize_and_charge'
     ]
     required: yes
     default: 'none'
