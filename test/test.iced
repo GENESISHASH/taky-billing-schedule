@@ -14,6 +14,8 @@ valid_opts = {
   initial_method: 'charge'
   after_trial_method: 'charge'
   after_trial_amount_dollars: '100'
+  initial_auth_amount_cents:100
+  initial_void_amount_cents:50
   max_cycles: 0
 }
 
@@ -140,3 +142,8 @@ it 'should allow for max_time to limit the amount of results', (done) ->
 
   done() if queue.length is 5
 
+it 'should accept authorize and chage initial_method', (done) ->
+  opts = _.clone valid_opts
+  opts.initial_method = 'authorize_and_charge'
+  c = new Cycle opts
+  done() if helpers.type(c) is 'object'
