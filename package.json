@@ -1,7 +1,7 @@
 {
   "name": "taky-billing-schedule",
   "description": "dynamic schedule generation for cyclic billing",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "./dist/module.js",
   "author": "douglas lauer <taky@taky.com>",
   "repository": "douglauer/taky-billing-schedule",
