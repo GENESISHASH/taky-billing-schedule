@@ -1,10 +1,10 @@
 require('iced-coffee-script').register()
-_ = require 'taky'
+_ = require('wegweg')({globals:on,shelljs:on})
 
 task 'test', (opts) ->
   exec """
     #{which 'mocha'} 
-      --compilers iced:iced-coffee-script/register -R spec
+      --require iced-coffee-script/register -R spec test/test.iced
   """.split('\n').join(''), {async:on}
 
 task 'build', ->
